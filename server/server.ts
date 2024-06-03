@@ -1,7 +1,8 @@
 // server.ts
 import express, { Request, Response } from "express";
 import next from "next";
-import { ParsedUrlQuery } from "querystring";
+import { createCmdMessage } from "./helpers";
+// import createBaseExpressMiddleware from "./middlewares";
 
 const dev: boolean = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -9,11 +10,6 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const server = express();
-
-  // Custom routes can be defined here
-  server.get("/custom-route", (req: Request, res: Response) => {
-    return app.render(req, res, "/custom-page", req.query as ParsedUrlQuery);
-  });
 
   server.get("/api/data", (req: Request, res: Response) => {
     res.json({ message: "Hello from the custom server!" });
@@ -25,8 +21,12 @@ app.prepare().then(() => {
   });
 
   const PORT: number = parseInt(process.env.PORT as string, 10) || 3000;
+
   server.listen(PORT, (err?: any) => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${PORT}`);
+    createCmdMessage({
+      type: "success",
+      message: `> App is running on http://localhost:${PORT}`,
+    });
   });
 });
